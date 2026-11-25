@@ -191,3 +191,55 @@ plt.title("Original Data - RT per block")
 plt.figure()
 plt.title("Reconstructed Data - RT per block")
 plt.imshow(M_reconstructed, aspect="auto")
+
+
+#%% MORE ON SVD
+'''
+What you (in theory) already know from linear algebra
+    - SVD is the diagonalization of A by using A@A_transposed and A_transposed@A (where @ is matrix multiplication, just like the python syntax)
+        --> U@S@V_transposed
+    - diagonalization gives us [some matrix with eigenvectors][diagonal matrix of eigenvalues][some matrix with eigenvectors]
+    - a diagonal matrix has an orthonormal basis
+    - eigenvalue/vector pairs are interesting vecause they only scale, they don't rotate
+    - orthogonal projection, change of basis
+
+Why do we use SVD in data analysis?
+Option 1 - Dimensionality reduction:
+real life brain data is huuuuuuge. Here we only have 12 variables (the mean rt for each cobdition for each block), but even so 
+in order to plot each of our 40 participants, we would have to have an axis for each of the 12 variables, and 12 is a bit 
+inconvenient for actually being able to plot the data. You could plot each pair of coordinates, but then you'd still have 
+12! (factorial) possible permutations, so at least ~ 400.000.000 plots X_X it then becomes almost impossible to see relationships 
+(correlations, clusters etc) within the data. Now think of gene expression data ~ 10k variables (1 nr of mRNA level for each gene),
+ or fMRI (3 space coordinates and several hundred-thousand time steps). It becomes unrealistic and bothersome.
+
+ Fortunately, when we diagonalize the data, the U and V give us eigenvectors that describe the direction of most variance in these datasets. 
+ Because the eigenVALUES are sorted in descending order, so are the eigenVECTORS (or 'COMPONENTS') will be in the order of most variance explained 
+ to least variance explained (while remaining orthogonal to each other). Now you can take your 40 data points and project (onto the orthogonal 
+ basis/change of coordinates in this new orthogona basis) and plot them onto just 2-3- a few of these components. Essentially, you only look at those 
+ components of the data that describe the most variance - the aspect of the data that varies the most from one datapoint to another. 
+ 
+Remember that the directions are sorted, so the first component will explain more of the variance than the second component, which will explain
+more than the third etc. This can be C1: ~85% (like in the example) C2 ~10%, C3~4% etc. Or it can be C1:30% C2:14% C3:1% etc (any values). You 
+usually then do a check (like the first plot or the cummulative sum) to see roughly how many comopnents you want to keep in your analysis (here 
+we keep 2). You can then further further analyze the scores (the coefficients of the projection onto each component) of each component, and see
+how they change across your data points compared to your variables (the original 12 RT means). See more on how to interpret the plot in the cmments
+above. You also can check the correlation of the scores of each componenent to each of your variables.
+
+Option 2 - Clustering (not explored in this exercise)
+When you move from a 12-dimenstiona (n-dimensional) space to a 2-3 dimensional space you might be able to spot correlations in the data OR clusters
+(literally, clouds of points that group together on the plot)
+
+Option 3 - Data Compression 
+This is a lie, we're actually going to look at data RECONSTRUCTION first. So again, your components explain the direction of most variance AND the
+projection coefficients, so we can re-build the original dataset by doing the reverse operation (so far we went from X - data to -> U@S@V_tr, now we 
+do U@S@V_transposed -> data - but only for the first few relevant components we selected in Option 1). You can then check to see how similar this 
+reconstruction is to the original data. 
+
+This is useful, for instance, to compress images (reduce their resolution ~ kinda) for sharing via mail for ex.
+(where you have a maximum size limit), and then unpack the original images to a reconstructd resolution - hence, data compression
+
+ 
+
+https://www.youtube.com/watch?v=KQ76Q3Efyxc <-- some nice visualizations, tho they talk a bit more about the math of it all, every now and then the 
+graphics show what I am trying to explain. Focus on the clouds of data and the directions of larges variance (most spread)
+'''
